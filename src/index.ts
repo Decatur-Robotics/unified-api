@@ -1,10 +1,9 @@
 import OmitCallSignature from "omit-call-signature";
-import { request } from "http";
 
 /**
  * @tested_by tests/index.test.ts
  */
-export namespace ApiErrors {
+namespace ApiErrors {
 	export type ErrorType = { error: string };
 
 	export class Error {
@@ -57,18 +56,18 @@ export namespace ApiErrors {
 	}
 }
 
-export interface HttpRequest {
+interface HttpRequest {
 	url?: string;
 	body: any;
 }
 
-export interface ApiResponse<TSend> {
+interface ApiResponse<TSend> {
 	send(data: TSend | ApiErrors.ErrorType): ApiResponse<TSend>;
 	status(code: number): ApiResponse<TSend>;
 	error(code: number, message: string): ApiResponse<TSend>;
 }
 
-export type Route<
+type Route<
 	TArgs extends Array<any>,
 	TReturn,
 	TDependencies,
@@ -98,12 +97,12 @@ export type Route<
 	) => Promise<any> | any;
 };
 
-export enum RequestMethod {
+enum RequestMethod {
 	POST = "POST",
 	GET = "GET",
 }
 
-export class RequestHelper {
+class RequestHelper {
 	constructor(
 		public baseUrl: string,
 		private onError: (url: string) => void,
@@ -139,7 +138,7 @@ export class RequestHelper {
 /**
  * There's no easy one-liner to create a function with properties while maintaining typing, so I made this shortcut
  */
-export function createRoute<
+function createRoute<
 	TArgs extends Array<any>,
 	TReturn,
 	TDependencies,
@@ -172,11 +171,11 @@ export function createRoute<
 	return Object.assign(clientHandler ?? { subUrl: "newRoute" }, server) as any;
 }
 
-export type Segment<TDependencies> = {
+type Segment<TDependencies> = {
 	[route: string]: Segment<TDependencies> | Route<any, any, TDependencies, any>;
 };
 
-export abstract class ApiTemplate<
+abstract class ApiTemplate<
 	TDependencies,
 	TRequest extends HttpRequest = HttpRequest,
 > {
@@ -222,13 +221,13 @@ export abstract class ApiTemplate<
 	}
 }
 
-export enum ErrorLogMode {
+enum ErrorLogMode {
 	Throw,
 	Log,
 	None,
 }
 
-export abstract class ServerApi<
+abstract class ServerApi<
 	TDependencies,
 	TRequest extends HttpRequest = HttpRequest,
 	TResponse extends ApiResponse<any> = ApiResponse<any>,
@@ -298,14 +297,11 @@ export abstract class ServerApi<
 	abstract getDependencies(req: TRequest, res: TResponse): TDependencies;
 }
 
-/**
- * Misc design notes (may be outdated):
- * ApiRoute has 2 call signatures:
- * - (args): client method
- *    - Needs to be populated with full path
- * - (req, res, deps, args): server method
- *
- * ApiSegment has a fields that are ApiRoutes
- *
- * ServerApiManager has a root ApiSegment
- */
+module.exports = {
+	ApiErrors,
+	ApiTemplate,
+	ServerApi,
+	createRoute,
+	RequestMethod,
+	RequestHelper,
+};
