@@ -5,7 +5,7 @@ import {
 	ErrorLogMode,
 	RequestHelper,
 	ServerApi,
-} from "../src/index.js";
+} from "../src";
 
 const API_PREFIX = "api/";
 
