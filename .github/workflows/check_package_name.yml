@@ -1,0 +1,33 @@
+name: Check Package Name
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    outputs:
+      package_name:
+        description: "The package name from the package.json file"
+        value: ${{ jobs.check_package_name.outputs.name }}
+
+jobs:
+  check_package_name:
+    runs-on: ubuntu-latest
+    outputs:
+      name: ${{ steps.check_pkg_name.outputs.name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4.1.0
+        with:
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Check package name
+        run: |
+          {
+            # This is a delimiter to help parse the output. Not sure how exactly it works, but it does.
+            echo "name<<EOF"
+            npm pkg get name
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+        id: check_pkg_name
