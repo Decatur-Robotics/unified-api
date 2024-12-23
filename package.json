@@ -1,6 +1,6 @@
 {
 	"name": "unified-api",
-	"version": "1.0.9",
+	"version": "1.0.10",
 	"description": "Easily create and call APIs in Typescript",
 	"author": "Decatur Robotics",
 	"license": "MIT",
@@ -39,7 +39,7 @@
 		"one",
 		"single"
 	],
-	"main": "dist/index.ts",
+	"main": "dist/index.js",
 	"devDependencies": {
 		"@types/jest": "^29.5.14",
 		"eslint": "^9.17.0",
