@@ -4,7 +4,7 @@ import { request } from "http";
 /**
  * @tested_by tests/index.test.ts
  */
-export namespace Errors {
+export namespace ApiErrors {
 	export type ErrorType = { error: string };
 
 	export class Error {
@@ -63,7 +63,7 @@ export interface HttpRequest {
 }
 
 export interface ApiResponse<TSend> {
-	send(data: TSend | Errors.ErrorType): ApiResponse<TSend>;
+	send(data: TSend | ApiErrors.ErrorType): ApiResponse<TSend>;
 	status(code: number): ApiResponse<TSend>;
 	error(code: number, message: string): ApiResponse<TSend>;
 }
@@ -246,7 +246,7 @@ export abstract class ServerApi<
 		const res = this.parseRawResponse(rawRes);
 
 		if (!req.url) {
-			throw new Errors.InvalidRequestError(res);
+			throw new ApiErrors.InvalidRequestError(res);
 		}
 
 		const path = req.url.slice(this.urlPrefix.length).split("/");
@@ -257,7 +257,8 @@ export abstract class ServerApi<
 				this.api,
 			) as unknown as Route<any, any, TDependencies, any> | undefined;
 
-			if (!route?.handler) throw new Errors.NotFoundError(res, path.join("/"));
+			if (!route?.handler)
+				throw new ApiErrors.NotFoundError(res, path.join("/"));
 
 			const deps = this.getDependencies(req, res);
 			const body = req.body;
@@ -269,11 +270,11 @@ export abstract class ServerApi<
 				body,
 			);
 
-			if (!authorized) throw new Errors.UnauthorizedError(res);
+			if (!authorized) throw new ApiErrors.UnauthorizedError(res);
 
 			await route.handler(req, res, deps, authData, body);
 		} catch (e) {
-			(e as Errors.Error).route = path.join("/");
+			(e as ApiErrors.Error).route = path.join("/");
 
 			if (this.errorLogMode === ErrorLogMode.None) return;
 
@@ -282,11 +283,11 @@ export abstract class ServerApi<
 			console.error(e);
 
 			// If it's an error we've already handled, don't do anything
-			if (e instanceof Errors.Error) {
+			if (e instanceof ApiErrors.Error) {
 				return;
 			}
 
-			new Errors.InternalServerError(res);
+			new ApiErrors.InternalServerError(res);
 		}
 	}
 
