@@ -3,7 +3,7 @@ import OmitCallSignature from "omit-call-signature";
 /**
  * @tested_by tests/index.test.ts
  */
-namespace ApiErrors {
+export namespace ApiErrors {
 	export type ErrorType = { error: string };
 
 	export class Error {
@@ -56,18 +56,18 @@ namespace ApiErrors {
 	}
 }
 
-interface HttpRequest {
+export interface HttpRequest {
 	url?: string;
 	body: any;
 }
 
-interface ApiResponse<TSend> {
+export interface ApiResponse<TSend> {
 	send(data: TSend | ApiErrors.ErrorType): ApiResponse<TSend>;
 	status(code: number): ApiResponse<TSend>;
 	error(code: number, message: string): ApiResponse<TSend>;
 }
 
-type Route<
+export type Route<
 	TArgs extends Array<any>,
 	TReturn,
 	TDependencies,
@@ -97,12 +97,12 @@ type Route<
 	) => Promise<any> | any;
 };
 
-enum RequestMethod {
+export enum RequestMethod {
 	POST = "POST",
 	GET = "GET",
 }
 
-class RequestHelper {
+export class RequestHelper {
 	constructor(
 		public baseUrl: string,
 		private onError: (url: string) => void,
@@ -138,7 +138,7 @@ class RequestHelper {
 /**
  * There's no easy one-liner to create a function with properties while maintaining typing, so I made this shortcut
  */
-function createRoute<
+export function createRoute<
 	TArgs extends Array<any>,
 	TReturn,
 	TDependencies,
@@ -171,11 +171,11 @@ function createRoute<
 	return Object.assign(clientHandler ?? { subUrl: "newRoute" }, server) as any;
 }
 
-type Segment<TDependencies> = {
+export type Segment<TDependencies> = {
 	[route: string]: Segment<TDependencies> | Route<any, any, TDependencies, any>;
 };
 
-abstract class ApiTemplate<
+export abstract class ApiTemplate<
 	TDependencies,
 	TRequest extends HttpRequest = HttpRequest,
 > {
@@ -221,13 +221,13 @@ abstract class ApiTemplate<
 	}
 }
 
-enum ErrorLogMode {
+export enum ErrorLogMode {
 	Throw,
 	Log,
 	None,
 }
 
-abstract class ServerApi<
+export abstract class ServerApi<
 	TDependencies,
 	TRequest extends HttpRequest = HttpRequest,
 	TResponse extends ApiResponse<any> = ApiResponse<any>,
@@ -296,12 +296,3 @@ abstract class ServerApi<
 
 	abstract getDependencies(req: TRequest, res: TResponse): TDependencies;
 }
-
-module.exports = {
-	ApiErrors,
-	ApiTemplate,
-	ServerApi,
-	createRoute,
-	RequestMethod,
-	RequestHelper,
-};
