@@ -1,10 +1,11 @@
 {
 	"name": "unified-api",
-	"version": "1.0.7",
+	"version": "1.0.8",
 	"description": "Easily create and call APIs in Typescript",
 	"author": "Decatur Robotics",
 	"license": "MIT",
 	"scripts": {
+		"build": "tsc & tsc --declaration",
 		"validate": "tsc --noEmit",
 		"test": "jest --passWithNoTests",
 		"lint": "eslint . --max-warnings=0",
@@ -38,7 +39,7 @@
 		"one",
 		"single"
 	],
-	"main": "src/index.ts",
+	"main": "dist/index.ts",
 	"devDependencies": {
 		"@types/jest": "^29.5.14",
 		"eslint": "^9.17.0",
