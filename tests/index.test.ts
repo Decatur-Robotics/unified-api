@@ -25,7 +25,12 @@ export class TestRes implements ApiResponse<any> {
 
 class TestApi extends ApiTemplate<TestDependencies> {
 	segment = {
-		routeWithPresetCaller: createRoute<[string, number], string, TestDependencies, {}>(
+		routeWithPresetCaller: createRoute<
+			[string, number],
+			string,
+			TestDependencies,
+			{}
+		>(
 			{
 				isAuthorized: (req, res, deps, [name, number]) =>
 					Promise.resolve({ authorized: true, authData: {} }),
