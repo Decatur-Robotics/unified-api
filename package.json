@@ -1,6 +1,6 @@
 {
 	"name": "unified-api",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Easily create and call APIs in Typescript",
 	"author": "Decatur Robotics",
 	"license": "MIT",
@@ -31,7 +31,12 @@
 		"request",
 		"response",
 		"web",
-		"web-server"
+		"web-server",
+		"mono",
+		"monolith",
+		"unified",
+		"one",
+		"single"
 	],
 	"main": "src/index.ts",
 	"devDependencies": {
