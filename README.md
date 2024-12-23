@@ -1,6 +1,6 @@
-# Easy API
+# Unified API
 
-Easy API lets you create APIs quickly and easily.
+Unified API lets you create APIs quickly and easily. No more creating two methods for one API route, no more writing the same boilerplate code over and over again. Just write one handler method and use that same method to both call and respond to that API route.
 
 ## Usage
 
@@ -93,4 +93,4 @@ const clientApi = new TestApi();
 await clientApi.requestHelper("Test", 1234); // await is optional
 ```
 
-## Easy API © 2024 by Decatur Robotics is licensed under the MIT license.
+## Unified API © 2024 by Decatur Robotics is licensed under the MIT license.
