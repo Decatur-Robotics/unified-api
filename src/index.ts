@@ -113,7 +113,6 @@ export class RequestHelper {
 		body: any,
 		method: RequestMethod = RequestMethod.POST,
 	) {
-		console.log("Requesting", this.baseUrl + url);
 		const rawResponse = await fetch(this.baseUrl + url, {
 			method: method,
 			headers: {
@@ -249,9 +248,7 @@ export abstract class ServerApi<
 			throw new ApiErrors.InvalidRequestError(res);
 		}
 
-		console.log("Handling", req.url);
 		const path = req.url.slice(this.urlPrefix.length).split("/");
-		console.log("Path", path);
 
 		try {
 			const route = path.reduce(
