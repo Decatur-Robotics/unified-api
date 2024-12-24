@@ -2,6 +2,11 @@
 
 Unified API lets you create APIs quickly and easily. No more creating two methods for one API route, no more writing the same boilerplate code over and over again. Just write one handler method and use that same method to both call and respond to that API route.
 
+Designed to be easily unit testable ([`mongo-anywhere`](https://www.npmjs.com/package/mongo-anywhere) works well for unit testing).
+
+Using Next.js? Use the [`unified-api-nextjs`](https://www.npmjs.com/package/unified-api-nextjs) package to automatically use Next.js types
+and quickly connect your webserver to your API.
+
 ## Usage
 
 ### Creating endpoints
