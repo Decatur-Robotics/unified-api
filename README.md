@@ -22,6 +22,7 @@ type TestDependencies = {
 class TestApi extends ApiTemplate<TestDependencies> {
 	constructor() {
 		// First argument is the prefix for all API routes, second argument is a function that is called whenever a route throws an error.
+		// API_PREFIX should be replaced by your API prefix (ex: /api/).
 		const requestHelper = new RequestHelper(API_PREFIX, () => {});
 		super(requestHelper, false);
 		this.init(); // Init configures API routes so they are ready to be called.
