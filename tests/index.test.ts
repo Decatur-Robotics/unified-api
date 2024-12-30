@@ -112,6 +112,18 @@ test(`ApiLib.${ApiTemplate.name}.init: Sets caller`, async () => {
 	expect(clientApi.segment.routeWithPresetCaller.call).toBeDefined();
 });
 
+test(`ApiLib.${ApiTemplate.name}.init: Does not work without API_PREFIX`, async () => {
+	class NoPrefixTestApi extends ApiTemplate<TestDependencies> {
+		constructor() {
+			const requestHelper = new RequestHelper(undefined as any, () => {});
+			super(requestHelper, false);
+			this.init();
+		}
+	}
+
+	expect(() => new NoPrefixTestApi()).toThrow();
+});
+
 test(`ApiLib.${createRoute.name}: Creates callable route without caller`, async () => {
 	expect(typeof clientApi.segment.routeWithoutPresetCaller).toBe("function");
 	expect(clientApi.segment.routeWithoutPresetCaller.subUrl).toBe(
