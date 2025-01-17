@@ -249,6 +249,7 @@ export abstract class ServerApi<
 		}
 
 		const path = req.url.slice(this.urlPrefix.length).split("/");
+		console.log(`Mapped ${req.url} -> ${path.join("/")}`);
 
 		try {
 			const route = path.reduce(
