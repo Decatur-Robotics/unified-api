@@ -106,7 +106,12 @@ export class RequestHelper {
 	constructor(
 		public baseUrl: string,
 		private onError: (url: string) => void,
-	) {}
+		logPrefix: boolean = true,
+	) {
+		if (logPrefix) {
+			console.log(`Constructed RequestHelper with baseUrl: ${this.baseUrl}`);
+		}
+	}
 
 	async request(
 		url: string,
@@ -237,8 +242,12 @@ export abstract class ServerApi<
 	constructor(
 		private api: ApiTemplate<TDependencies>,
 		private errorLogMode: ErrorLogMode = ErrorLogMode.Log,
+		logPrefix: boolean = true,
 	) {
 		this.urlPrefix = api.requestHelper.baseUrl;
+		if (logPrefix) {
+			console.log(`Constructed ServerApi with urlPrefix: ${this.urlPrefix}`);
+		}
 	}
 
 	async handle(req: TRequest, rawRes: any) {

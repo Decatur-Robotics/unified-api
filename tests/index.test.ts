@@ -77,7 +77,7 @@ class TestApi extends ApiTemplate<TestDependencies> {
 	});
 
 	constructor() {
-		const requestHelper = new RequestHelper(API_PREFIX, () => {});
+		const requestHelper = new RequestHelper(API_PREFIX, () => {}, false);
 		super(requestHelper, false);
 		this.init();
 	}
@@ -85,7 +85,7 @@ class TestApi extends ApiTemplate<TestDependencies> {
 
 class TestServerApi extends ServerApi<TestDependencies> {
 	constructor() {
-		super(new TestApi(), ErrorLogMode.None);
+		super(new TestApi(), ErrorLogMode.None, false);
 	}
 
 	getDependencies() {
