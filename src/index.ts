@@ -151,7 +151,7 @@ export class RequestHelper {
 
 		if (res?.error) {
 			if (route.fallback) {
-				return route.fallback(res).then((res) => {
+				return route.fallback?.(res).then((res) => {
 					route.afterResponse?.(res);
 					return res;
 				});

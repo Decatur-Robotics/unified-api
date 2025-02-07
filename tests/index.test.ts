@@ -7,6 +7,11 @@ import {
 	ServerApi,
 } from "../src";
 
+global.fetch = () =>
+	Promise.resolve({
+		text: () => Promise.resolve(JSON.stringify({ success: true })),
+	}) as any;
+
 const API_PREFIX = "api/";
 
 type TestDependencies = {
@@ -83,7 +88,7 @@ class TestApi extends ApiTemplate<TestDependencies> {
 			res.status(200).send("Hello, world!");
 		},
 		beforeCall: jest.fn(),
-	}, () => Promise.resolve());
+	});
 
 	constructor() {
 		const requestHelper = new RequestHelper(API_PREFIX, () => {}, false);
@@ -192,7 +197,7 @@ test(`ApiLib.${ServerApi.name}: Calls beforeCall`, async () => {
 	const api = new TestApi();
 
 	api.routeWithBeforeCall();
-	expect(clientApi.routeWithBeforeCall.beforeCall).toHaveBeenCalled();
+	expect(api.routeWithBeforeCall.beforeCall).toHaveBeenCalled();
 });
 
 test(`ApiLib.${ServerApi.name}: Passes arguments to before`, async () => {
@@ -201,6 +206,6 @@ test(`ApiLib.${ServerApi.name}: Passes arguments to before`, async () => {
 	api.routeWithBeforeCall("hello", 42);
 
 	expect(
-		(clientApi.routeWithBeforeCall.beforeCall as jest.Mock).mock.calls[0][0],
+		(api.routeWithBeforeCall.beforeCall as jest.Mock).mock.calls[0][0],
 	).toEqual(["hello", 42]);
 });
