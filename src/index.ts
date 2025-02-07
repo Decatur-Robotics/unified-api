@@ -78,6 +78,9 @@ export type Route<
 	subUrl: string;
 
 	(...args: TArgs): Promise<TReturn>;
+	beforeCall?: (args: TArgs) => Promise<TArgs>;
+	afterResponse?: (res: TReturn) => Promise<void>;
+	fallback?: (res: TReturn) => Promise<TReturn>;
 
 	isAuthorized: (
 		req: TRequest,
@@ -113,12 +116,27 @@ export class RequestHelper {
 		}
 	}
 
-	async request(
-		url: string,
+	async request<
+		TArgs extends Array<any>,
+		TReturn,
+		TDependencies,
+		TDataFetchedDuringAuth,
+		TRequest extends HttpRequest = HttpRequest,
+		TResponse extends ApiResponse<TReturn> = ApiResponse<TReturn>,
+	>(
+		route: Route<
+			TArgs,
+			TReturn,
+			TDependencies,
+			TDataFetchedDuringAuth,
+			TRequest
+		>,
 		body: any,
 		method: RequestMethod = RequestMethod.POST,
 	) {
-		const rawResponse = await fetch(this.baseUrl + url, {
+		route.beforeCall?.(body);
+
+		const rawResponse = await fetch(this.baseUrl + route.subUrl, {
 			method: method,
 			headers: {
 				Accept: "application/json",
@@ -132,9 +150,18 @@ export class RequestHelper {
 		const res = text.length ? JSON.parse(text) : undefined;
 
 		if (res?.error) {
-			this.onError(url);
-			throw new Error(`${url}: ${res.error}`);
+			if (route.fallback) {
+				return route.fallback(res).then((res) => {
+					route.afterResponse?.(res);
+					return res;
+				});
+			}
+
+			this.onError(route.subUrl);
+			throw new Error(`${route.subUrl}: ${res.error}`);
 		}
+
+		route.afterResponse?.(res);
 
 		return res;
 	}
@@ -151,7 +178,7 @@ export function createRoute<
 	TRequest extends HttpRequest = HttpRequest,
 	TResponse extends ApiResponse<TReturn> = ApiResponse<TReturn>,
 >(
-	server: Omit<
+	config: Omit<
 		OmitCallSignature<
 			Route<
 				TArgs,
@@ -173,7 +200,7 @@ export function createRoute<
 	TRequest,
 	TResponse
 > {
-	return Object.assign(clientHandler ?? { subUrl: "newRoute" }, server) as any;
+	return Object.assign(clientHandler ?? { subUrl: "newRoute" }, config) as any;
 }
 
 export type Segment<TDependencies> = {
@@ -213,7 +240,7 @@ export abstract class ApiTemplate<
 				route.subUrl = subUrl + "/" + key;
 
 				segment[key] = createRoute(route, (...args: any[]) =>
-					requestHelper.request(route.subUrl, args),
+					requestHelper.request(route, args),
 				);
 			} else if (typeof value === "object") {
 				this.initSegment(requestHelper, value, subUrl + "/" + key);

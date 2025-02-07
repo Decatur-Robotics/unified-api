@@ -76,6 +76,15 @@ class TestApi extends ApiTemplate<TestDependencies> {
 		},
 	});
 
+	routeWithBeforeCall = createRoute({
+		isAuthorized: (req, res, deps, args) =>
+			Promise.resolve({ authorized: true, authData: {} }),
+		handler(req, res, deps, authData, args) {
+			res.status(200).send("Hello, world!");
+		},
+		beforeCall: jest.fn(),
+	}, () => Promise.resolve());
+
 	constructor() {
 		const requestHelper = new RequestHelper(API_PREFIX, () => {}, false);
 		super(requestHelper, false);
@@ -177,4 +186,21 @@ test(`ApiLib.${ServerApi.name}.${ServerApi.prototype.handle.name}: Passes authDa
 	await new TestServerApi().handle(req as any, res as any);
 
 	expect(res.send).toHaveBeenCalledWith(0);
+});
+
+test(`ApiLib.${ServerApi.name}: Calls beforeCall`, async () => {
+	const api = new TestApi();
+
+	api.routeWithBeforeCall();
+	expect(clientApi.routeWithBeforeCall.beforeCall).toHaveBeenCalled();
+});
+
+test(`ApiLib.${ServerApi.name}: Passes arguments to before`, async () => {
+	const api = new TestApi();
+
+	api.routeWithBeforeCall("hello", 42);
+
+	expect(
+		(clientApi.routeWithBeforeCall.beforeCall as jest.Mock).mock.calls[0][0],
+	).toEqual(["hello", 42]);
 });
