@@ -230,13 +230,13 @@ export abstract class ApiTemplate<
 	) {
 		for (const [key, value] of Object.entries(segment)) {
 			if (typeof value === "function") {
-				value.subUrl = subUrl + "/" + key;
+				value.subUrl = (subUrl ? subUrl + "/" : "") + key;
 			} else if (
 				(value as unknown as Route<any, any, TDependencies, any, TRequest>)
 					.subUrl === "newRoute"
 			) {
 				const route = value as unknown as Route<any, any, TDependencies, any>;
-				route.subUrl = subUrl + "/" + key;
+				route.subUrl = (subUrl ? subUrl + "/" : "") + key;
 
 				segment[key] = createRoute(route, (...args: any[]) =>
 					requestHelper.request(route, args),
