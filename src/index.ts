@@ -122,7 +122,6 @@ export class RequestHelper {
 		TDependencies,
 		TDataFetchedDuringAuth,
 		TRequest extends HttpRequest = HttpRequest,
-		TResponse extends ApiResponse<TReturn> = ApiResponse<TReturn>,
 	>(
 		route: Route<
 			TArgs,
@@ -158,7 +157,7 @@ export class RequestHelper {
 			}
 
 			this.onError(route.subUrl);
-			throw new Error(`${route.subUrl}: ${res.error}`);
+			// throw new Error(`${route.subUrl}: ${res.error}`);
 		}
 
 		route.afterResponse?.(res);
