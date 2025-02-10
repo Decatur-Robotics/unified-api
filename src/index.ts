@@ -123,19 +123,26 @@ export class RequestHelper {
 		TDataFetchedDuringAuth,
 		TRequest extends HttpRequest = HttpRequest,
 	>(
-		route: Route<
-			TArgs,
-			TReturn,
-			TDependencies,
-			TDataFetchedDuringAuth,
-			TRequest
-		>,
+		route:
+			| string
+			| Route<TArgs, TReturn, TDependencies, TDataFetchedDuringAuth, TRequest>,
 		body: any,
 		method: RequestMethod = RequestMethod.POST,
 	) {
-		route.beforeCall?.(body);
+		const parsedRoute =
+			typeof route === "string"
+				? ({ subUrl: route } as Route<
+						TArgs,
+						TReturn,
+						TDependencies,
+						TDataFetchedDuringAuth,
+						TRequest
+					>)
+				: route;
 
-		const rawResponse = await fetch(this.baseUrl + route.subUrl, {
+		parsedRoute.beforeCall?.(body);
+
+		const rawResponse = await fetch(this.baseUrl + parsedRoute.subUrl, {
 			method: method,
 			headers: {
 				Accept: "application/json",
@@ -149,18 +156,18 @@ export class RequestHelper {
 		const res = text.length ? JSON.parse(text) : undefined;
 
 		if (res?.error) {
-			if (route.fallback) {
-				return route.fallback?.(res).then((res) => {
-					route.afterResponse?.(res);
+			if (parsedRoute.fallback) {
+				return parsedRoute.fallback?.(res).then((res) => {
+					parsedRoute.afterResponse?.(res);
 					return res;
 				});
 			}
 
-			this.onError(route.subUrl);
+			this.onError(parsedRoute.subUrl);
 			// throw new Error(`${route.subUrl}: ${res.error}`);
 		}
 
-		route.afterResponse?.(res);
+		parsedRoute.afterResponse?.(res);
 
 		return res;
 	}
