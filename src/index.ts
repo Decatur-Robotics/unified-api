@@ -79,7 +79,7 @@ export type Route<
 
 	(...args: TArgs): Promise<TReturn>;
 	beforeCall?: (args: TArgs) => Promise<TArgs>;
-	afterResponse?: (res: TReturn) => Promise<void>;
+	afterResponse?: (res: TReturn, ranFallback: boolean) => Promise<void>;
 	fallback?: (res: TReturn) => Promise<TReturn>;
 
 	isAuthorized: (
@@ -158,7 +158,7 @@ export class RequestHelper {
 		if (res?.error) {
 			if (parsedRoute.fallback) {
 				return parsedRoute.fallback?.(res).then((res) => {
-					parsedRoute.afterResponse?.(res);
+					parsedRoute.afterResponse?.(res, true);
 					return res;
 				});
 			}
@@ -167,7 +167,7 @@ export class RequestHelper {
 			// throw new Error(`${route.subUrl}: ${res.error}`);
 		}
 
-		parsedRoute.afterResponse?.(res);
+		parsedRoute.afterResponse?.(res, false);
 
 		return res;
 	}
