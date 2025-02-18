@@ -80,7 +80,7 @@ export type Route<
 	(...args: TArgs): Promise<TReturn>;
 	beforeCall?: (args: TArgs) => Promise<TArgs>;
 	afterResponse?: (res: TReturn, ranFallback: boolean) => Promise<void>;
-	fallback?: (res: TReturn) => Promise<TReturn>;
+	fallback?: (...args: TArgs) => Promise<TReturn>;
 
 	isAuthorized: (
 		req: TRequest,
@@ -157,7 +157,7 @@ export class RequestHelper {
 
 		if (res?.error) {
 			if (parsedRoute.fallback) {
-				return parsedRoute.fallback?.(res).then((res) => {
+				return parsedRoute.fallback?.(...body).then((res) => {
 					parsedRoute.afterResponse?.(res, true);
 					return res;
 				});
