@@ -155,7 +155,7 @@ export class RequestHelper {
 
 		async function getRes(raw: Response | { error: any }) {
 			if ("error" in raw) {
-				return raw.error;
+				return raw;
 			}
 
 			const text = await raw.text();
