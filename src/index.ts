@@ -149,11 +149,21 @@ export class RequestHelper {
 				"Content-Type": "application/json",
 			},
 			body: JSON.stringify(body),
-		});
+		}).catch((e) => ({
+			error: e,
+		}));
 
-		// Null or undefined are sent as an empty string that we can't parse as JSON
-		const text = await rawResponse.text();
-		const res = text.length ? JSON.parse(text) : undefined;
+		async function getRes(raw: Response | { error: any }) {
+			if ("error" in raw) {
+				return raw.error;
+			}
+
+			const text = await raw.text();
+			// Null and undefined are sent as an empty string that we can't parse as JSON
+			return text.length ? JSON.parse(text) : undefined;
+		}
+
+		const res = await getRes(rawResponse);
 
 		if (res?.error) {
 			if (parsedRoute.fallback) {
@@ -164,7 +174,6 @@ export class RequestHelper {
 			}
 
 			this.onError(parsedRoute.subUrl);
-			// throw new Error(`${route.subUrl}: ${res.error}`);
 		}
 
 		parsedRoute.afterResponse?.(res, false);
