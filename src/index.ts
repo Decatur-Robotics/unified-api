@@ -74,13 +74,18 @@ export type Route<
 	TDataFetchedDuringAuth,
 	TRequest extends HttpRequest = HttpRequest,
 	TResponse extends ApiResponse<TReturn> = ApiResponse<TReturn>,
+	TLocalDependencies extends object = {},
 > = {
 	subUrl: string;
 
 	(...args: TArgs): Promise<TReturn>;
-	beforeCall?: (args: TArgs) => Promise<TArgs>;
-	afterResponse?: (res: TReturn, ranFallback: boolean) => Promise<void>;
-	fallback?: (...args: TArgs) => Promise<TReturn>;
+	beforeCall?: (deps: TLocalDependencies, args: TArgs) => Promise<TArgs>;
+	afterResponse?: (
+		deps: TLocalDependencies,
+		res: TReturn,
+		ranFallback: boolean,
+	) => Promise<void>;
+	fallback?: (deps: TLocalDependencies, args: TArgs) => Promise<TReturn>;
 
 	isAuthorized: (
 		req: TRequest,
@@ -105,7 +110,7 @@ export enum RequestMethod {
 	GET = "GET",
 }
 
-export class RequestHelper {
+export class RequestHelper<TLocalDependencies extends object = {}> {
 	constructor(
 		public baseUrl: string,
 		private onError: (url: string) => void,
@@ -125,7 +130,15 @@ export class RequestHelper {
 	>(
 		route:
 			| string
-			| Route<TArgs, TReturn, TDependencies, TDataFetchedDuringAuth, TRequest>,
+			| Route<
+					TArgs,
+					TReturn,
+					TDependencies,
+					TDataFetchedDuringAuth,
+					TRequest,
+					any,
+					TLocalDependencies
+			  >,
 		body: any,
 		method: RequestMethod = RequestMethod.POST,
 	) {
@@ -140,7 +153,9 @@ export class RequestHelper {
 					>)
 				: route;
 
-		parsedRoute.beforeCall?.(body);
+		const deps = await this.getLocalDependencies();
+
+		parsedRoute.beforeCall?.(deps, body);
 
 		const rawResponse = await fetch(this.baseUrl + parsedRoute.subUrl, {
 			method: method,
@@ -167,8 +182,8 @@ export class RequestHelper {
 
 		if (res?.error) {
 			if (parsedRoute.fallback) {
-				return parsedRoute.fallback?.(...body).then((res) => {
-					parsedRoute.afterResponse?.(res, true);
+				return parsedRoute.fallback?.(deps, body).then((res) => {
+					parsedRoute.afterResponse?.(deps, res, true);
 					return res;
 				});
 			}
@@ -176,9 +191,13 @@ export class RequestHelper {
 			this.onError(parsedRoute.subUrl);
 		}
 
-		parsedRoute.afterResponse?.(res, false);
+		parsedRoute.afterResponse?.(deps, res, false);
 
 		return res;
+	}
+
+	async getLocalDependencies(): Promise<TLocalDependencies> {
+		return {} as TLocalDependencies;
 	}
 }
 

@@ -116,26 +116,30 @@ test(`ApiLib.${createRoute.name}: Creates callable route`, async () => {
 	expect(res).toBe("Hello, world 42!");
 });
 
-test(`ApiLib.${ApiTemplate.name}.init: Sets subUrl`, () => {
-	expect(clientApi.segment.routeWithPresetCaller.subUrl).toBe(
-		"/segment/routeWithPresetCaller",
-	);
-});
+describe(`ApiLib.${ApiTemplate.name}`, () => {
+	describe(`ApiLib.${ApiTemplate.name}.init`, () => {
+		test("Sets subUrl", () => {
+			expect(clientApi.segment.routeWithPresetCaller.subUrl).toBe(
+				"/segment/routeWithPresetCaller",
+			);
+		});
 
-test(`ApiLib.${ApiTemplate.name}.init: Sets caller`, async () => {
-	expect(clientApi.segment.routeWithPresetCaller.call).toBeDefined();
-});
+		test("Sets caller", async () => {
+			expect(clientApi.segment.routeWithPresetCaller.call).toBeDefined();
+		});
 
-test(`ApiLib.${ApiTemplate.name}.init: Does not work without API_PREFIX`, async () => {
-	class NoPrefixTestApi extends ApiTemplate<TestDependencies> {
-		constructor() {
-			const requestHelper = new RequestHelper(undefined as any, () => {});
-			super(requestHelper, false);
-			this.init();
-		}
-	}
+		test("Errors without API_PREFIX", async () => {
+			class NoPrefixTestApi extends ApiTemplate<TestDependencies> {
+				constructor() {
+					const requestHelper = new RequestHelper(undefined as any, () => {});
+					super(requestHelper, false);
+					this.init();
+				}
+			}
 
-	expect(() => new NoPrefixTestApi()).toThrow();
+			expect(() => new NoPrefixTestApi()).toThrow();
+		});
+	});
 });
 
 test(`ApiLib.${createRoute.name}: Creates callable route without caller`, async () => {
@@ -145,67 +149,71 @@ test(`ApiLib.${createRoute.name}: Creates callable route without caller`, async 
 	);
 });
 
-test(`ApiLib.${ServerApi.name}.${ServerApi.prototype.handle.name}: Finds correct method`, async () => {
-	const req = {
-		url: API_PREFIX + "segment/routeWithoutPresetCaller",
-		body: ["world", 42],
-	};
-	const res = new TestRes();
+describe(`ApiLib.${ServerApi.name}`, () => {
+	describe(`ApiLib.${ServerApi.prototype.handle.name}`, () => {
+		test("Finds correct method", async () => {
+			const req = {
+				url: API_PREFIX + "segment/routeWithoutPresetCaller",
+				body: ["world", 42],
+			};
+			const res = new TestRes();
 
-	await new TestServerApi().handle(req as any, res as any);
+			await new TestServerApi().handle(req as any, res as any);
 
-	expect(res.send).toHaveBeenCalledWith("Hello, world 42!");
-	expect(res.status).toHaveBeenCalledWith(200);
-});
+			expect(res.send).toHaveBeenCalledWith("Hello, world 42!");
+			expect(res.status).toHaveBeenCalledWith(200);
+		});
 
-test(`ApiLib.${ServerApi.name}.${ServerApi.prototype.handle.name}: Finds methods that are not in segments`, async () => {
-	const req = {
-		url: API_PREFIX + "rootRoute",
-		body: ["world", 42],
-	};
-	const res = new TestRes();
+		test("Finds methods that are not in segments", async () => {
+			const req = {
+				url: API_PREFIX + "rootRoute",
+				body: ["world", 42],
+			};
+			const res = new TestRes();
 
-	await new TestServerApi().handle(req as any, res as any);
+			await new TestServerApi().handle(req as any, res as any);
 
-	expect(res.send).toHaveBeenCalledWith("Hello, world 42!");
-	expect(res.status).toHaveBeenCalledWith(200);
-});
+			expect(res.send).toHaveBeenCalledWith("Hello, world 42!");
+			expect(res.status).toHaveBeenCalledWith(200);
+		});
 
-test(`ApiLib.${ServerApi.name}.${ServerApi.prototype.handle.name}: Throws 403 if unauthorized`, async () => {
-	const req = {
-		url: API_PREFIX + "unauthorizedRoute",
-	};
-	const res = new TestRes();
+		test("Throws 403 if unauthorized", async () => {
+			const req = {
+				url: API_PREFIX + "unauthorizedRoute",
+			};
+			const res = new TestRes();
 
-	await new TestServerApi().handle(req as any, res as any);
+			await new TestServerApi().handle(req as any, res as any);
 
-	expect(res.status).toHaveBeenCalledWith(403);
-});
+			expect(res.status).toHaveBeenCalledWith(403);
+		});
 
-test(`ApiLib.${ServerApi.name}.${ServerApi.prototype.handle.name}: Passes authData to handler`, async () => {
-	const req = {
-		url: API_PREFIX + "routeWithAuthData",
-	};
-	const res = new TestRes();
+		test("Passes authData to handler", async () => {
+			const req = {
+				url: API_PREFIX + "routeWithAuthData",
+			};
+			const res = new TestRes();
 
-	await new TestServerApi().handle(req as any, res as any);
+			await new TestServerApi().handle(req as any, res as any);
 
-	expect(res.send).toHaveBeenCalledWith(0);
-});
+			expect(res.send).toHaveBeenCalledWith(0);
+		});
+	});
 
-test(`ApiLib.${ServerApi.name}: Calls beforeCall`, async () => {
-	const api = new TestApi();
+	test("Calls beforeCall", async () => {
+		const api = new TestApi();
 
-	api.routeWithBeforeCall();
-	expect(api.routeWithBeforeCall.beforeCall).toHaveBeenCalled();
-});
+		api.routeWithBeforeCall();
+		expect(api.routeWithBeforeCall.beforeCall).toHaveBeenCalled();
+	});
 
-test(`ApiLib.${ServerApi.name}: Passes arguments to before`, async () => {
-	const api = new TestApi();
+	test("Passes arguments to beforeCall", async () => {
+		const api = new TestApi();
 
-	api.routeWithBeforeCall("hello", 42);
+		api.routeWithBeforeCall("hello", 42);
 
-	expect(
-		(api.routeWithBeforeCall.beforeCall as jest.Mock).mock.calls[0][0],
-	).toEqual(["hello", 42]);
+		expect(
+			(api.routeWithBeforeCall.beforeCall as jest.Mock).mock.calls[0][0],
+		).toEqual(["hello", 42]);
+	});
 });
