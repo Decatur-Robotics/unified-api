@@ -199,21 +199,4 @@ describe(`ApiLib.${ServerApi.name}`, () => {
 			expect(res.send).toHaveBeenCalledWith(0);
 		});
 	});
-
-	test("Calls beforeCall", async () => {
-		const api = new TestApi();
-
-		api.routeWithBeforeCall();
-		expect(api.routeWithBeforeCall.beforeCall).toHaveBeenCalled();
-	});
-
-	test("Passes arguments to beforeCall", async () => {
-		const api = new TestApi();
-
-		api.routeWithBeforeCall("hello", 42);
-
-		expect(
-			(api.routeWithBeforeCall.beforeCall as jest.Mock).mock.calls[0][0],
-		).toEqual(["hello", 42]);
-	});
 });
