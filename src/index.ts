@@ -114,7 +114,7 @@ export class RequestHelper<TLocalDependencies extends object = {}> {
 	constructor(
 		public baseUrl: string,
 		private onError: (url: string) => void,
-		logPrefix: boolean = true,
+		logPrefix: boolean = false,
 	) {
 		if (logPrefix) {
 			console.log(`Constructed RequestHelper with baseUrl: ${this.baseUrl}`);
@@ -154,11 +154,8 @@ export class RequestHelper<TLocalDependencies extends object = {}> {
 				: route;
 
 		const deps = await this.getLocalDependencies();
-		console.log("deps", deps);
 
-		console.log("set", (parsedRoute as any).set);
 		parsedRoute.beforeCall?.(deps, body);
-		(parsedRoute as any).called = true;
 
 		const rawResponse = await fetch(this.baseUrl + parsedRoute.subUrl, {
 			method: method,
