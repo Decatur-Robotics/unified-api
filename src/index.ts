@@ -303,7 +303,7 @@ export abstract class ServerApi<
 	constructor(
 		private api: ApiTemplate<TDependencies>,
 		private errorLogMode: ErrorLogMode = ErrorLogMode.Log,
-		logPrefix: boolean = true,
+		logPrefix: boolean = false,
 	) {
 		this.urlPrefix = api.requestHelper.baseUrl;
 		if (logPrefix) {
