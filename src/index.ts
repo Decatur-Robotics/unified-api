@@ -179,7 +179,7 @@ export class RequestHelper<TLocalDependencies extends object = {}> {
 				return text.length ? JSON.parse(text) : undefined;
 			} catch (e) {
 				return {
-					error: `Failed to parse response (URL: ${parsedRoute.subUrl}): ${e}`,
+					error: `Failed to parse response (${method} ${parsedRoute.subUrl}): ${e}`,
 				};
 			}
 		}
