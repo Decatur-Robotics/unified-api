@@ -1,6 +1,6 @@
 {
 	"name": "unified-api",
-	"version": "1.1.2",
+	"version": "1.1.3",
 	"description": "Easily create and call APIs in Typescript",
 	"author": "Decatur Robotics",
 	"license": "MIT",

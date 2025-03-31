@@ -173,9 +173,15 @@ export class RequestHelper<TLocalDependencies extends object = {}> {
 				return raw;
 			}
 
-			const text = await raw.text();
-			// Null and undefined are sent as an empty string that we can't parse as JSON
-			return text.length ? JSON.parse(text) : undefined;
+			try {
+				const text = await raw.text();
+				// Null and undefined are sent as an empty string that we can't parse as JSON
+				return text.length ? JSON.parse(text) : undefined;
+			} catch (e) {
+				return {
+					error: `Failed to parse response (URL: ${parsedRoute.subUrl}): ${e}`,
+				};
+			}
 		}
 
 		const res = await getRes(rawResponse);
