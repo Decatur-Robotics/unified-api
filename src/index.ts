@@ -113,7 +113,7 @@ export enum RequestMethod {
 export class RequestHelper<TLocalDependencies extends object = {}> {
 	constructor(
 		public baseUrl: string,
-		private onError: (url: string) => void,
+		private onError: (url: string, error: any) => void,
 		logPrefix: boolean = false,
 	) {
 		if (logPrefix) {
@@ -194,7 +194,7 @@ export class RequestHelper<TLocalDependencies extends object = {}> {
 				});
 			}
 
-			this.onError(parsedRoute.subUrl);
+			this.onError(parsedRoute.subUrl, res.error);
 		}
 
 		parsedRoute.afterResponse?.(deps, res, false);
